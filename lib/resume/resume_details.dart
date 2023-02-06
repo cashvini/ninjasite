@@ -111,6 +111,38 @@ class ResumeDetailsState extends ConsumerState<ResumeDetails> {
               // editResume(jobTitle.toString(),
               //     description.toString(), resume.toString());
             }),
+        //delete popup with confirm.
+        ElevatedButton(
+          child: Icon(
+            Icons.delete,
+            size: 30,
+          ),
+          onPressed: () => showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Delete the following?'),
+              content: Text(widget.titleCtrl.text.toString()),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    firestoreInstance
+                        .collection("user")
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .collection("resume")
+                        .doc(ref.read(resumeSNP.notifier).value!['id'])
+                        .delete();
+                    Navigator.pop(context, 'OK');
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

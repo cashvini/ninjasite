@@ -90,7 +90,7 @@ class UserResumePage extends ConsumerWidget {
                             Icons.archive,
                             size: 30,
                           ),
-                          onPressed: () async {})
+                          onPressed: () async {}),
                     ],
                   ),
                 ],
