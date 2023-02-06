@@ -35,18 +35,6 @@ class ResumesPage extends ConsumerWidget {
                 child: Text("Add Resume",
                     style: Theme.of(context).textTheme.headline3),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  final docref = FirebaseFirestore.instance
-                      .collection(
-                          'user/${FirebaseAuth.instance.currentUser!.uid}/vacancy')
-                      .doc();
-                  final remove = <String, dynamic>{"": FieldValue.delete()};
-                  docref.update(remove);
-                },
-                child: Text("Delete Resume",
-                    style: Theme.of(context).textTheme.headline3),
-              ),
               ListTile(
                 title: Text("Resume 1",
                     style: Theme.of(context).textTheme.headline4),
