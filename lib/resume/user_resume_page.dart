@@ -11,10 +11,6 @@ import 'package:jsninja/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'package:jsninja/resume/resume_list.dart';
 
-// final resumeIdProvider = StateProvider<String?>((ref) => null);
-// final jobTitleProvider = StateProvider<String?>((ref) => null);
-//final resumeSNP = StateProvider<Map<String, dynamic>?>((ref) => null);
-// final resumeDescriptionProvider = StateProvider<String?>((ref) => null);
 final resumeSNP = StateNotifierProvider<
         GenericStateNotifier<Map<String, dynamic>?>, Map<String, dynamic>?>(
     (ref) => GenericStateNotifier<Map<String, dynamic>?>(null));
@@ -23,17 +19,13 @@ final firestoreInstance = FirebaseFirestore.instance;
 
 class UserResumePage extends ConsumerWidget {
   String uid = FirebaseAuth.instance.currentUser!.uid;
+
   String resumeID = '';
 
   TextEditingController addJobTitlechCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final jobTitle = ref.watch(jobTitleProvider).toString();
-    // final description = ref.watch(resumeDescriptionProvider).toString();
-    // final resume = ref.watch(resumeProvider).toString();
-    // resumeID = ref.watch(resumeIdProvider).toString();
-
     return Scaffold(
       appBar: MyAppBar.getBar(context, ref),
       drawer: (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
@@ -76,23 +68,6 @@ class UserResumePage extends ConsumerWidget {
                   Expanded(
                     child: ResumeDetails(ref.watch(resumeSNP)),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      ElevatedButton(
-                          // ignore: prefer_const_constructors
-                          child: Icon(
-                            Icons.archive,
-                            size: 30,
-                          ),
-                          onPressed: () async {}),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -128,6 +103,8 @@ class UserResumePage extends ConsumerWidget {
                         .collection("resume")
                         .add({
                       'jobTitle': addJobTitlechCtrl.text,
+                      'description': null,
+                      'body': null,
                       'timeCreated': FieldValue.serverTimestamp(),
                       'author': uid,
                       'lastupdated': null
@@ -144,27 +121,5 @@ class UserResumePage extends ConsumerWidget {
             ],
           );
         });
-  }
-
-//Edit resume
-  editResume(String jobTitle, String description, String resume) {
-    // Resume resumeObject = Resume(
-    //     jobTitle: jobTitleController.text,
-    //     description: resumeDescriptionController.text,
-    //     resume: resumeController.text,
-    //     lastupdated: Timestamp.now());
-
-    // if (jobTitle == resumeObject.jobTitle &&
-    //     description == resumeObject.description &&
-    //     resume == resumeObject.resume) {
-    //   return;
-    // } else {
-    //   firestoreInstance
-    //       .collection("user")
-    //       .doc(uid)
-    //       .collection('resume')
-    //       .doc(resumeIdController.text)
-    //       .update(resumeObject.toMap());
-    // }
   }
 }

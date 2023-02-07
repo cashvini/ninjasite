@@ -32,21 +32,6 @@ class ResumeTile extends ConsumerWidget {
                     ],
                   ),
                   onTap: () {
-                    // ref
-                    //     .read(resumeIdProvider.notifier)
-                    //     .update((state) => searchDoc.reference.id);
-
-                    // ref
-                    //     .read(jobTitleProvider.notifier)
-                    //     .update((state) => searchDoc.data()!['jobTitle']);
-
-                    // ref
-                    //     .read(resumeProvider.notifier)
-                    //     .update((state) => searchDoc.data()!['resume']);
-
-                    // ref
-                    //     .read(resumeSNP.notifier)
-                    //     .update((state) => searchDoc.data());
                     ref.read(resumeSNP.notifier).value = {
                       'id': searchDoc.id,
                       'data': searchDoc.data()

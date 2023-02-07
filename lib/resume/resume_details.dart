@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jsninja/resume/resume_list.dart';
 import 'package:jsninja/resume/user_resume_page.dart';
 
 class ResumeDetails extends ConsumerStatefulWidget {
@@ -13,7 +15,22 @@ class ResumeDetails extends ConsumerStatefulWidget {
   final Map<String, dynamic>? data;
   ResumeDetails(this.data, {Key? key}) : super(key: key) {
     print('ResumeDetail constructor: ${data}');
-    if (data != null) titleCtrl.text = data!['data']['jobTitle'];
+
+    if (data != null) {
+      titleCtrl.text = data!['data']['jobTitle'];
+
+      if (data!['data']['description'] != null) {
+        descCtrl.text = data!['data']!['description'];
+      } else {
+        bodyCtrl.text = '';
+      }
+
+      if (data!['data']['body'] != null) {
+        bodyCtrl.text = data!['data']['body'];
+      } else {
+        bodyCtrl.text = '';
+      }
+    }
   }
 
   @override
@@ -24,12 +41,6 @@ class ResumeDetailsState extends ConsumerState<ResumeDetails> {
   @override
   void initState() {
     super.initState();
-
-    ///print('resume details: ${widget.data}');
-    //titleCtrl.text = widget.data!['title'];
-    // "ref" can be used in all life-cycles of a StatefulWidget.
-    // if (ref.read(resumeSNP.notifier).state != null)
-    //   titleCtrl.text = ref.read(resumeSNP.notifier).state!['title'];
   }
 
   @override
@@ -52,7 +63,6 @@ class ResumeDetailsState extends ConsumerState<ResumeDetails> {
           onChanged: (v) {},
           controller: widget.titleCtrl,
         ),
-
         TextField(
           decoration: const InputDecoration(
             hintText: "Job Description",
@@ -68,7 +78,6 @@ class ResumeDetailsState extends ConsumerState<ResumeDetails> {
           onChanged: (v) {},
           controller: widget.descCtrl,
         ),
-
         TextField(
           // ignore: prefer_const_constructors
           decoration: InputDecoration(
@@ -89,59 +98,68 @@ class ResumeDetailsState extends ConsumerState<ResumeDetails> {
           onChanged: (v) {},
           controller: widget.bodyCtrl,
         ),
-        //),
-        ElevatedButton(
-            // ignore: prefer_const_constructors
-            child: Icon(
-              Icons.edit,
-              size: 30,
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            ElevatedButton(
+                // ignore: prefer_const_constructors
+                child: Icon(
+                  Icons.edit,
+                  size: 30,
+                ),
+                onPressed: () async {
+                  print('saving ${ref.read(resumeSNP.notifier).value!['id']}');
+                  firestoreInstance
+                      .collection("user")
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .collection('resume')
+                      .doc(ref.read(resumeSNP.notifier).value!['id'])
+                      .update({
+                    'jobTitle': widget.titleCtrl.text,
+                    'description': widget.descCtrl.text,
+                    'body': widget.bodyCtrl.text,
+                    'lastupdated': Timestamp.now()
+                  });
+                }),
+            const SizedBox(
+              width: 10,
             ),
-            onPressed: () async {
-              print('saving ${ref.read(resumeSNP.notifier).value!['id']}');
-              firestoreInstance
-                  .collection("user")
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .collection('resume')
-                  .doc(ref.read(resumeSNP.notifier).value!['id'])
-                  .update({
-                'jobTitle': widget.titleCtrl.text
-                //ref.read(resumeSNP.notifier).value!['data']
-              });
 
-              // editResume(jobTitle.toString(),
-              //     description.toString(), resume.toString());
-            }),
-        //delete popup with confirm.
-        ElevatedButton(
-          child: Icon(
-            Icons.delete,
-            size: 30,
-          ),
-          onPressed: () => showDialog<String>(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-              title: const Text('Delete the following?'),
-              content: Text(widget.titleCtrl.text.toString()),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'Cancel'),
-                  child: const Text('Cancel'),
+            //delete popup with confirm.
+            ElevatedButton(
+              child: Icon(
+                Icons.delete,
+                size: 30,
+              ),
+              onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Delete the following?'),
+                  content: Text(widget.titleCtrl.text.toString()),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        firestoreInstance
+                            .collection("user")
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .collection("resume")
+                            .doc(ref.read(resumeSNP.notifier).value!['id'])
+                            .delete();
+                        Navigator.pop(context, 'OK');
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
                 ),
-                TextButton(
-                  onPressed: () {
-                    firestoreInstance
-                        .collection("user")
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .collection("resume")
-                        .doc(ref.read(resumeSNP.notifier).value!['id'])
-                        .delete();
-                    Navigator.pop(context, 'OK');
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );
