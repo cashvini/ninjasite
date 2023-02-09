@@ -1,9 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jsninja/main.dart';
+import 'package:jsninja/resume/user_resume_page.dart';
 import 'package:jsninja/state/theme_state_notifier.dart';
 import 'package:jsninja/common.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jsninja/drawer.dart';
+import 'package:jsninja/vacancies/user_vacancies.dart';
 
 class MyAppBar {
   static final List<String> _tabs = [
@@ -18,22 +24,38 @@ class MyAppBar {
   ];
 
   static PreferredSizeWidget getBar(BuildContext context, WidgetRef ref) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return AppBar(
-      automaticallyImplyLeading:
-          (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
-              ? true
-              : false,
+      // automaticallyImplyLeading:
+      //     (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
+      //         ? true
+      //         : false,
       leadingWidth:
           (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH) ? null : 100,
-      leading: (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
-          ? null
-          : Padding(
-              padding: EdgeInsets.all(10),
-              child: Text(''),
-            ),
+      leading: Builder(
+        builder: (BuildContext context) {
+          return (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
+              ? IconButton(
+                  icon: SvgPicture.asset(
+                      isDarkMode ? 'assets/dark.svg' : 'assets/light.svg'),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  tooltip:
+                      MaterialLocalizations.of(context).openAppDrawerTooltip,
+                )
+              : Padding(
+                  padding: EdgeInsets.all(10),
+                  child: SvgPicture.asset(
+                      isDarkMode ? 'assets/dark.svg' : 'assets/light.svg'),
+                );
+        },
+      ),
       title: (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
           ? null
-          : Align(
+          : Container(
+              // alignment: Alignment.topLeft,
+              // padding:Image.asset('assets/amlcloud.png'),
               child: SizedBox(
                   width: 800,
                   child: TabBar(

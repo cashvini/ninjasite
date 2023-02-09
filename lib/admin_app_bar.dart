@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jsninja/main.dart';
 import 'package:jsninja/state/theme_state_notifier.dart';
 import 'package:jsninja/common.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jsninja/drawer.dart';
 
 class AdminAppBar {
   static final List<String> _tabs = [
@@ -17,13 +19,33 @@ class AdminAppBar {
   ];
 
   static PreferredSizeWidget getBar(BuildContext context, WidgetRef ref) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return AppBar(
       // automaticallyImplyLeading:
       //     (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
       //         ? true
       //         : false,
-      // leadingWidth:
-      //     (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH) ? null : 100,
+      leadingWidth:
+          (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH) ? null : 100,
+      leading: Builder(builder: (BuildContext context) {
+        return (MediaQuery.of(context).size.width < WIDE_SCREEN_WIDTH)
+            //?
+            ? IconButton(
+                padding: EdgeInsets.all(10),
+                icon: SvgPicture.asset(
+                    isDarkMode ? 'assets/svg.svg' : 'assets/ninja-icon.svg'),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              )
+            : Padding(
+                padding: EdgeInsets.all(10),
+                child: SvgPicture.asset(
+                    isDarkMode ? 'assets/svg.svg' : 'assets/ninja-icon.svg'),
+              );
+      }),
+
       // leading: BackButton(onPressed: () => Navigator.of(context).pop()),
       // IconButton(
       //     icon:
